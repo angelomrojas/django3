@@ -1,6 +1,11 @@
 from django.db import models
 from stdimage.models import StdImageField
-# Create your models here.
+import uuid
+
+def get_file_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f'{uuid.uuid4()}.{ext}'
+    return filename
 
 class Base(models.Model):
     criados = models.DateField('Criação', auto_now_add=True)
@@ -47,7 +52,7 @@ class Funcionario(Base):
     nome = models.CharField('Nome', max_length=100)
     cargo = models.ForeignKey('core.Cargo', verbose_name='Cargo', on_delete=models.CASCADE)
     bio = models.TextField('Bio', max_length=200)
-    image = StdImageField('Image', upload_to='equipe', variations={'thumb': {'width':480, 'height':480, 'crop':True}})
+    image = StdImageField('Image', upload_to=get_file_path, variations={'thumb': {'width':480, 'height':480, 'crop':True}})
     facebook_link = models.CharField('Facebook', max_length=100, default='#')
     twitter_link = models.CharField('Twitter', max_length=100, default='#')
     instagram_link = models.CharField('Instagram', max_length=100, default='#')
@@ -58,6 +63,27 @@ class Funcionario(Base):
 
     def __str__(self):
         return self.nome
+    
+class Features(Base):
+
+    ICONE_CHOICES  = (
+        ('lni-rocket', 'Foguete'),
+        ('lni-laptop-phone', 'Laptop+Celular'),
+        ('Ini-cog', 'Engrenagem'),
+        ('lni-leaf', 'Folha'),
+        ('lni-layers', 'Camadas'),
+    )
+
+    ft_name = models.CharField('Nome', max_length=100)
+    ft_desc = models.TextField('Bio', max_length=200)
+    ft_icon = models.CharField('icone', max_length=30, choices=ICONE_CHOICES)
+
+    class Meta:
+        verbose_name = 'Característica'
+        verbose_name_plural = 'Características'
+
+    def __str__(self):
+        return self.ft_name
 
 
 
